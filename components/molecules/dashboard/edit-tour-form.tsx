@@ -266,7 +266,7 @@ export function EditTourForm({
               <FormLabel>Tour</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                value={field.value || undefined}
+                value={field.value ?? ""}
               >
                 <FormControl>
                   <SelectTrigger className="w-full">
@@ -351,7 +351,7 @@ export function EditTourForm({
               <FormLabel>Difficulty</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                value={field.value ?? undefined}
+                value={field.value ?? ""}
               >
                 <FormControl>
                   <SelectTrigger className="w-full">

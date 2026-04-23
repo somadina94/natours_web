@@ -81,7 +81,7 @@ export function CreateBookingForm() {
           render={({ field }) => (
             <FormItem className="md:col-span-2">
               <FormLabel>Tour</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value || undefined}>
+              <Select onValueChange={field.onChange} value={field.value ?? ""}>
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder={toursQ.isPending ? "Loading tours…" : "Select tour"} />
@@ -106,7 +106,7 @@ export function CreateBookingForm() {
             render={({ field }) => (
               <FormItem className="md:col-span-2">
                 <FormLabel>Customer</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || undefined}>
+                <Select onValueChange={field.onChange} value={field.value ?? ""}>
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue

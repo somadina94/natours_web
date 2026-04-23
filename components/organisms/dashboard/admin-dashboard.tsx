@@ -47,7 +47,7 @@ const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD
 const bookingsChartConfig = {
   bookings: {
     label: "Bookings",
-    color: "hsl(var(--primary))",
+    color: "#28b487",
   },
 } satisfies ChartConfig;
 
@@ -264,7 +264,7 @@ export function AdminDashboard() {
             ) : bookingsOverviewQ.isError ? (
               <p className="text-sm text-destructive">Unable to load booking trend.</p>
             ) : (
-              <ChartContainer config={bookingsChartConfig} className="h-44 w-full">
+              <ChartContainer config={bookingsChartConfig} className="h-44 w-full min-w-0">
                 <BarChart data={dailyBookings} accessibilityLayer>
                   <CartesianGrid vertical={false} />
                   <XAxis
@@ -276,7 +276,8 @@ export function AdminDashboard() {
                   <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
                   <Bar
                     dataKey="bookings"
-                    fill="var(--color-bookings)"
+                    fill="#28b487"
+                    stroke="#28b487"
                     radius={[6, 6, 0, 0]}
                   />
                 </BarChart>

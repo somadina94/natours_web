@@ -82,7 +82,7 @@ export function CreateReviewForm({ initialTourId }: { initialTourId?: string }) 
           render={({ field }) => (
             <FormItem>
               <FormLabel>Tour</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value || undefined}>
+              <Select onValueChange={field.onChange} value={field.value ?? ""}>
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue

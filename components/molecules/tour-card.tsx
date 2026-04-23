@@ -30,6 +30,7 @@ export function TourCard({
   const stops = tour.locations?.length ?? 0;
   const coverSrc = tourImageSrc(tour.imageCover);
   const coverRemote = /^https?:\/\//i.test(coverSrc);
+  const imageLoading: "eager" | "lazy" = index < 2 ? "eager" : "lazy";
 
   return (
     <motion.div
@@ -52,6 +53,7 @@ export function TourCard({
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                loading={imageLoading}
                 unoptimized
                 referrerPolicy="no-referrer"
               />
@@ -61,7 +63,7 @@ export function TourCard({
                 src={coverSrc}
                 alt={`${tour.name} tour cover`}
                 className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
+                loading={imageLoading}
               />
             )}
             <div className="absolute bottom-3 right-3 z-20 max-w-[78%] text-right">

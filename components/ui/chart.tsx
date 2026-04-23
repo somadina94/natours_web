@@ -33,14 +33,35 @@ export function ChartContainer({
 }) {
   const chartId = React.useId();
   const resolvedId = `chart-${id || chartId}`;
+  const hostRef = React.useRef<HTMLDivElement | null>(null);
+  const [ready, setReady] = React.useState(false);
+
+  React.useEffect(() => {
+    const el = hostRef.current;
+    if (!el) return;
+
+    const updateReady = (w: number, h: number) => {
+      setReady(w > 0 && h > 0);
+    };
+
+    updateReady(el.clientWidth, el.clientHeight);
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      updateReady(entry.contentRect.width, entry.contentRect.height);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   return (
     <ChartContext.Provider value={{ config }}>
       <div
+        ref={hostRef}
         data-slot="chart"
         data-chart={resolvedId}
         className={cn(
-          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line]:stroke-border/60 [&_.recharts-tooltip-cursor]:stroke-border [&_.recharts-reference-line_line]:stroke-border [&_.recharts-layer]:outline-none",
+          "flex w-full min-w-0 min-h-[160px] justify-center overflow-hidden text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line]:stroke-border/60 [&_.recharts-tooltip-cursor]:stroke-border [&_.recharts-reference-line_line]:stroke-border [&_.recharts-layer]:outline-none",
           className,
         )}
       >
@@ -50,12 +71,18 @@ export function ChartContainer({
               .map(([key, item]) => {
                 const color = item.color;
                 if (!color) return "";
-                return `[data-chart=${resolvedId}] { --color-${key}: ${color}; }`;
+                return `[data-chart="${resolvedId}"] { --color-${key}: ${color}; }`;
               })
               .join("\n"),
           }}
         />
-        <RechartsPrimitive.ResponsiveContainer>{children}</RechartsPrimitive.ResponsiveContainer>
+        {ready ? (
+          <RechartsPrimitive.ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={160}>
+            {children}
+          </RechartsPrimitive.ResponsiveContainer>
+        ) : (
+          <div className="h-full w-full" aria-hidden />
+        )}
       </div>
     </ChartContext.Provider>
   );

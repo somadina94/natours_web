@@ -177,7 +177,7 @@ export function CreateTourForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Difficulty</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select onValueChange={field.onChange} value={field.value ?? ""}>
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Difficulty" />

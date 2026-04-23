@@ -2,6 +2,19 @@ import { api } from "@/lib/api/client";
 import type { User } from "@/types/user";
 import type { ApiListPayload } from "@/types/api-list";
 import type { ApiItemResponse } from "@/types/tour";
+import type { AxiosRequestConfig } from "axios";
+
+const multipartFormConfig: AxiosRequestConfig = {
+  transformRequest: [
+    (body, headers) => {
+      if (body instanceof FormData) {
+        const h = headers as Record<string, string | undefined>;
+        delete h["Content-Type"];
+      }
+      return body;
+    },
+  ],
+};
 
 export async function getUsers() {
   const { data } = await api.get<ApiListPayload<User>>("/users");
@@ -24,6 +37,17 @@ export async function patchUpdateMe(body: { name: string; email: string }) {
   const { data } = await api.patch<{ status: string; data: { user: User } }>(
     "/users/updateMe",
     body,
+  );
+  return data.data.user;
+}
+
+export async function patchUpdateMyPhoto(file: File) {
+  const body = new FormData();
+  body.append("photo", file);
+  const { data } = await api.patch<{ status: string; data: { user: User } }>(
+    "/users/updateMyPhoto",
+    body,
+    multipartFormConfig,
   );
   return data.data.user;
 }
