@@ -33,6 +33,8 @@ import { MonthlyPlanCard } from "@/components/organisms/dashboard/monthly-plan-c
 import { CreateTourForm } from "@/components/molecules/dashboard/create-tour-form";
 import { CreateBookingForm } from "@/components/molecules/dashboard/create-booking-form";
 import { EditTourForm } from "@/components/molecules/dashboard/edit-tour-form";
+import { ProfileUpdateForm } from "@/components/molecules/dashboard/profile-update-form";
+import { ChangePasswordForm } from "@/components/molecules/dashboard/change-password-form";
 
 function tourFromBooking(tour: Booking["tour"]) {
   if (tour && typeof tour === "object" && "name" in tour) {
@@ -119,6 +121,32 @@ export function LeadGuideWorkspace({
       ) : null}
 
       {view === "monthly-plan" ? <MonthlyPlanCard /> : null}
+
+      {view === "profile" ? (
+        <Card className="border-border/70">
+          <CardHeader>
+            <CardTitle className="text-lg">Profile</CardTitle>
+            <CardDescription>
+              Update your name, email, and profile photo used across dashboard views.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ProfileUpdateForm />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {view === "password" ? (
+        <Card className="border-border/70">
+          <CardHeader>
+            <CardTitle className="text-lg">Password</CardTitle>
+            <CardDescription>Rotate your credentials and keep your account secure.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChangePasswordForm />
+          </CardContent>
+        </Card>
+      ) : null}
 
       {view === "create-tour" ? (
         <Card className="border-border/70">

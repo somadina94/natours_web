@@ -42,6 +42,8 @@ export const GUIDE_DASHBOARD_VIEWS: DashboardViewDef[] = [
 export const LEAD_GUIDE_DASHBOARD_VIEWS: DashboardViewDef[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "monthly-plan", label: "Monthly plan", icon: CalendarRange },
+  { id: "profile", label: "Profile", icon: UserRound },
+  { id: "password", label: "Password", icon: KeyRound },
   { id: "create-tour", label: "Create tour", icon: PlusCircle },
   { id: "update-tour", label: "Update tour", icon: Pencil },
   { id: "create-booking", label: "Manual booking", icon: TicketPlus },
