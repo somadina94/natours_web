@@ -1,0 +1,26 @@
+name: natours-web
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+    container_name: natours-web
+    ports:
+      - "4041:4041"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+      NODE_ENV: production
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - natours-network
+
+networks:
+  natours-network:
+    driver: bridge
