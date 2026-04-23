@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { BookOpen, Crown, DollarSign, Receipt, Trash2, Users } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis } from "recharts";
 import { toast } from "sonner";
 import { getAllBookings } from "@/lib/api/bookings";
 import { getTours } from "@/lib/api/tours";
@@ -35,7 +36,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { useAppSelector } from "@/store/hooks";
 import { ADMIN_VIEW_IDS } from "@/lib/dashboard-view-ids";
 import { buildDashboardHref } from "@/lib/dashboard-views";
@@ -44,18 +44,28 @@ import { useDashboardView } from "@/hooks/use-dashboard-view";
 
 const roles = ["user", "guide", "lead-guide", "admin"] as const;
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
-const bookingsChartConfig = {
-  bookings: {
-    label: "Bookings",
-    color: "#28b487",
-  },
-} satisfies ChartConfig;
 
 export function AdminDashboard() {
   const pathname = usePathname();
   const { view, tourId } = useDashboardView(ADMIN_VIEW_IDS);
   const me = useAppSelector((s) => s.auth.user);
   const qc = useQueryClient();
+  const [chartHostEl, setChartHostEl] = useState<HTMLDivElement | null>(null);
+  const [chartWidth, setChartWidth] = useState(0);
+
+  useEffect(() => {
+    const el = chartHostEl;
+    if (!el) return;
+    const set = (w: number) => setChartWidth(Math.max(0, Math.floor(w)));
+    set(el.clientWidth);
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      set(entry.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [chartHostEl]);
 
   const usersQ = useQuery({
     queryKey: ["users", "admin"],
@@ -264,24 +274,31 @@ export function AdminDashboard() {
             ) : bookingsOverviewQ.isError ? (
               <p className="text-sm text-destructive">Unable to load booking trend.</p>
             ) : (
-              <ChartContainer config={bookingsChartConfig} className="h-44 w-full min-w-0">
-                <BarChart data={dailyBookings} accessibilityLayer>
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="label"
-                    tickLine={false}
-                    tickMargin={8}
-                    axisLine={false}
-                  />
-                  <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
-                  <Bar
-                    dataKey="bookings"
-                    fill="#28b487"
-                    stroke="#28b487"
-                    radius={[6, 6, 0, 0]}
-                  />
-                </BarChart>
-              </ChartContainer>
+              <div
+                ref={setChartHostEl}
+                className="h-44 w-full min-w-0 overflow-hidden rounded-md"
+              >
+                {chartWidth > 0 ? (
+                  <BarChart width={chartWidth} height={176} data={dailyBookings}>
+                    <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
+                    <XAxis
+                      dataKey="label"
+                      tickLine={false}
+                      tickMargin={8}
+                      axisLine={false}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                    />
+                    <Tooltip
+                      formatter={(value) => [value, "Bookings"]}
+                      contentStyle={{
+                        borderRadius: 10,
+                        border: "1px solid hsl(var(--border))",
+                      }}
+                    />
+                    <Bar dataKey="bookings" fill="#28b487" stroke="#28b487" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                ) : null}
+              </div>
             )}
           </CardContent>
         </Card>
