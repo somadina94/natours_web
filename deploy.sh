@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Docker Deployment Script for Natours Web
 # Run this script on your EC2 instance
@@ -62,20 +63,29 @@ mkdir -p logs
 echo "🛑 Stopping existing containers..."
 $DOCKER_COMPOSE down
 
-# Remove old images to free up space
-echo "🧹 Cleaning up old images..."
+# Remove old images and stale build cache to avoid corrupted layer references
+echo "🧹 Cleaning up old images and build cache..."
 docker image prune -f
+docker builder prune -f
 
 # Build and start the application
 echo "🔨 Building and starting the application..."
 echo "🔍 Verifying environment variables are available..."
 echo "NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:0:20}..."
-$DOCKER_COMPOSE up --build -d
+$DOCKER_COMPOSE build --pull
+$DOCKER_COMPOSE up -d
 
 # Check if the container is running
 echo "📊 Checking container status..."
 sleep 5
 $DOCKER_COMPOSE ps
+
+if ! $DOCKER_COMPOSE ps --status running | grep -q "web"; then
+    echo "❌ Deployment failed: web container is not running"
+    echo "📋 Recent logs:"
+    $DOCKER_COMPOSE logs --tail=50
+    exit 1
+fi
 
 # Show logs
 echo "📋 Recent logs:"
