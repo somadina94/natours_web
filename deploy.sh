@@ -59,21 +59,21 @@ fi
 echo "📁 Creating logs directory..."
 mkdir -p logs
 
-# Stop and remove existing containers
+# Stop and remove existing containers and local images
 echo "🛑 Stopping existing containers..."
-$DOCKER_COMPOSE down
+$DOCKER_COMPOSE down --rmi local --remove-orphans
 
-# Remove old images and stale build cache to avoid corrupted layer references
-echo "🧹 Cleaning up old images and build cache..."
-docker image prune -f
-docker builder prune -f
+# Remove ALL build cache (not just unused) to fix corrupted BuildKit layer refs
+echo "🧹 Clearing all Docker build cache..."
+docker buildx prune -af
+docker builder prune -af
 
 # Build and start the application
 echo "🔨 Building and starting the application..."
 echo "🔍 Verifying environment variables are available..."
 echo "NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:0:20}..."
-$DOCKER_COMPOSE build --pull
-$DOCKER_COMPOSE up -d
+$DOCKER_COMPOSE build --no-cache --pull
+$DOCKER_COMPOSE up -d --force-recreate
 
 # Check if the container is running
 echo "📊 Checking container status..."
